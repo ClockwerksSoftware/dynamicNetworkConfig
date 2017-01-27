@@ -1,0 +1,7 @@
+*.sw?
+.tox
+*.egg-info
+*env*/
+.*env*/
+*.pyc
+.coverage
