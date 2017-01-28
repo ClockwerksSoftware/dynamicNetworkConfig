@@ -37,6 +37,11 @@ class TestBase(unittest.TestCase):
         import dynamicNetworkConfig
         dynamicNetworkConfig.context = None
 
+    def assertInDict(self, dict_values, dict_to_validate):
+        for k, v in dict_values:
+            self.assertIn(k, dict_to_validate)
+            self.assertEqual(v, dict_to_validate[k])
+
     def simulate_request(self, method, path, **kwargs):
         self.srmock = ftest.StartResponseMock()
         headers = kwargs.get('headers', self.headers).copy()

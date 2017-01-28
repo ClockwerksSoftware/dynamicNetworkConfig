@@ -37,16 +37,12 @@ class TestModelBase(TestBase):
 
         serialized = bm.serialize()
         self.assertEqual(len(serialized), 2)
-        self.assertIn(
-            bm.JSON_FIELD_NAME,
-            serialized
-        )
-        self.assertIn(
-            bm.JSON_FIELD_PATH,
-            serialized
-        )
-        self.assertEqual(serialized[bm.JSON_FIELD_NAME], self.name)
-        self.assertEqual(serialized[bm.JSON_FIELD_PATH], self.path)
+
+        validate_set = [
+            (bm.JSON_FIELD_NAME, self.name),
+            (bm.JSON_FIELD_PATH, self.path)
+        ]
+        self.assertInDict(validate_set, serialized)
 
     def test_deserialize(self):
         serialized = {

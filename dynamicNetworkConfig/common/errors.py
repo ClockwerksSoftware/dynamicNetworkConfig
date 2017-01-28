@@ -20,3 +20,15 @@ class InvalidGroupName(DynamicNetworkConfigErrors):
 
 class InvalidObjectName(DynamicNetworkConfigErrors):
     pass
+
+
+class InvalidGroupModel(DynamicNetworkConfigErrors):
+    pass
+
+
+class InvalidGroupListing(InvalidGroupModel):
+    pass
+
+
+class InvalidObjectListing(InvalidGroupModel):
+    pass

@@ -1,6 +1,7 @@
 """
 Group Model: FS equivalent - directory
 """
+from dynamicNetworkConfig.common import errors
 from dynamicNetworkConfig.model.base_model import BaseModel
 
 
@@ -13,8 +14,8 @@ class GroupModel(BaseModel):
     .. note:: Groups and Objects are just the names of the sub-items
     """
 
-    FIELD_SUBGROUPS = "groups"
-    FIELD_SUBOBJECTS = "objects"
+    JSON_FIELD_SUBGROUPS = "groups"
+    JSON_FIELD_SUBOBJECTS = "objects"
 
     ROOT_PATH = "/"
 
@@ -24,8 +25,8 @@ class GroupModel(BaseModel):
         return cls(
             base.name,
             base.path,
-            data[cls.FIELD_SUBGROUPS],
-            data[cls.FIELD_SUBOBJECTS]
+            data[cls.JSON_FIELD_SUBGROUPS],
+            data[cls.JSON_FIELD_SUBOBJECTS]
         )
 
     def __init__(self, name, path, groups, objects):
@@ -33,18 +34,22 @@ class GroupModel(BaseModel):
         self.__subgroups = groups
         self.__objects = objects
 
-        assert isinstance(self.__subgroups, (list, set))
-        assert isinstance(self.__objects, (list, set))
+        if not isinstance(self.__subgroups, (list, set)):
+            raise errors.InvalidGroupListing
+
+        if not isinstance(self.__objects, (list, set)):
+            raise errors.InvalidObjectListing
+
 
     def serialize(self):
-        data = super(self, GroupModel).serialize()
+        data = super(GroupModel, self).serialize()
         data.update(
             {
-                self.FIELD_SUBGROUPS: [
+                self.JSON_FIELD_SUBGROUPS: [
                     subgroup
                     for subgroup in self.groups
                 ],
-                self.FIELD_SUBOBJECTS: [
+                self.JSON_FIELD_SUBOBJECTS: [
                     subobject
                     for subobject in self.objects
                 ]
