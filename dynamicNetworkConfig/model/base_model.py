@@ -1,10 +1,68 @@
+import re
+
 import six
+
+from dynamicNetworkConfig.common import errors
 
 
 class BaseModel(object):
     """
     The primal descriptions
     """
+
+    PATH_SEPARATOR = "/"
+    PATH_ROOT = "/"
+
+    NAME_MATCHER = re.compile("^\w*$")
+    GROUP_NAME_MATCHER = re.compile("^\w*$")
+    OBJECT_NAME_MATCHER = re.compile("^\w*$")
+
+    @classmethod
+    def validate_name(cls, name):
+        if not cls.NAME_MATCHER.match(name):
+            raise errors.InvalidName(
+                "Invalid Name".format(
+                    name
+                )
+            )
+
+    @classmethod
+    def validate_group_name(cls, name):
+        if not cls.GROUP_NAME_MATCHER.match(name):
+            raise errors.InvalidGroupName(
+                "Invalid Group Name - {0}".format(
+                    name
+                )
+            )
+
+    @classmethod
+    def validate_object_name(cls, name):
+        if not cls.OBJECT_NAME_MATCHER.match(name):
+            raise errors.InvalidObjectName(
+                "Invalid Object Name - {0}".format(
+                    name
+                )
+            )
+
+    @classmethod
+    def validate_path(cls, path):
+        if not path.startswith(cls.PATH_SEPARATOR):
+            raise errors.InvalidPath(
+                "Path does not start with the root"
+            )
+
+        groups = path.split(cls.PATH_SEPARATOR)
+        groups.remove('')
+
+        for group_name in groups:
+            try:
+                cls.validate_group_name(group_name)
+            except errors.InvalidGroupName:
+                raise errors.InvalidPath(
+                    "Path contains invalid group name {0}".format(
+                        group_name
+                    )
+                )
 
     # JSON Fields for serialization support
     JSON_FIELD_NAME = "name"
@@ -27,8 +85,11 @@ class BaseModel(object):
         self.__name = name
         self.__path = path
 
-        assert isinstance(self.name, six.text_type)
-        assert isinstance(self.path, six.text_type)
+        assert isinstance(self.name, six.string_types)
+        assert isinstance(self.path, six.string_types)
+
+        self.validate_name(self.name)
+        self.validate_path(self.path)
 
     @property
     def name(self):

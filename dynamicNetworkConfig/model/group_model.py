@@ -29,12 +29,12 @@ class GroupModel(BaseModel):
         )
 
     def __init__(self, name, path, groups, objects):
-        super(self, GroupModel).__init__(name, path)
+        super(GroupModel, self).__init__(name, path)
         self.__subgroups = groups
         self.__objects = objects
 
-        assert isinstance(self.groups, (list, set))
-        assert isinstance(self.objects, (list, set))
+        assert isinstance(self.__subgroups, (list, set))
+        assert isinstance(self.__objects, (list, set))
 
     def serialize(self):
         data = super(self, GroupModel).serialize()
