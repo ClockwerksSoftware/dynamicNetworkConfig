@@ -1,8 +1,7 @@
 """
 Object Model: FS equivalent - file
 """
-import six
-
+from dynamicNetworkConfig.common import errors
 from dynamicNetworkConfig.model.base_model import BaseModel
 
 
@@ -15,8 +14,8 @@ class ObjectModel(BaseModel):
     .. note:: Properties are just the names of the sub-items
     """
 
-    FIELD_GROUP_NAME = "group"
-    FIELD_SUBPROPERTIES = "properties"
+    JSON_FIELD_GROUP_NAME = "group"
+    JSON_FIELD_SUBPROPERTIES = "properties"
 
     @classmethod
     def deserialize(cls, data):
@@ -24,24 +23,26 @@ class ObjectModel(BaseModel):
         return cls(
             base.name,
             base.path,
-            data[cls.FIELD_GROUP_NAME],
-            data[cls.FIELD_SUBPROPERTIES]
+            data[cls.JSON_FIELD_GROUP_NAME],
+            data[cls.JSON_FIELD_SUBPROPERTIES]
         )
 
     def __init__(self, name, path, groupName, properties):
-        super(self, ObjectModel).__init__(name, path)
+        super(ObjectModel, self).__init__(name, path)
         self.__group = groupName
         self.__properties = properties
 
-        assert isinstance(self.properties, (list, set))
-        assert isinstance(self.groupName, six.text_type)
+        if not isinstance(self.__properties, (list, set)):
+            raise errors.InvalidPropertyListing
+
+        self.validate_group_name(self.groupName)
 
     def serialize(self):
-        data = super(self, ObjectModel).serialize()
+        data = super(ObjectModel, self).serialize()
         data.update(
             {
-                self.FIELD_GROUP_NAME: self.groupName,
-                self.FIELD_SUBPROPERTIES: [
+                self.JSON_FIELD_GROUP_NAME: self.groupName,
+                self.JSON_FIELD_SUBPROPERTIES: [
                     objectProperty
                     for objectProperty in self.properties
                 ]

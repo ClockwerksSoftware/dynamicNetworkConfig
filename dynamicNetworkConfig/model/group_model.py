@@ -40,7 +40,6 @@ class GroupModel(BaseModel):
         if not isinstance(self.__objects, (list, set)):
             raise errors.InvalidObjectListing
 
-
     def serialize(self):
         data = super(GroupModel, self).serialize()
         data.update(

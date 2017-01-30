@@ -28,11 +28,22 @@ class BaseModel(object):
 
     @classmethod
     def validate_group_name(cls, name):
+        if not isinstance(name, six.string_types):
+            raise errors.InvalidGroupName(
+                "Invalid Group Name type - {0} - {1}".format(
+                    name,
+                    type(name)
+                )
+            )
         if not cls.GROUP_NAME_MATCHER.match(name):
             raise errors.InvalidGroupName(
                 "Invalid Group Name - {0}".format(
                     name
                 )
+            )
+        if not len(name):
+            raise errors.InvalidGroupName(
+                "Invalid Group Name - null string"
             )
 
     @classmethod
@@ -43,9 +54,17 @@ class BaseModel(object):
                     name
                 )
             )
+        if not len(name):
+            raise errors.InvalidObjectName(
+                "Invalid Object Name - null string"
+            )
 
     @classmethod
     def validate_path(cls, path):
+        if path == cls.PATH_SEPARATOR:
+            # root path
+            return
+
         if not path.startswith(cls.PATH_SEPARATOR):
             raise errors.InvalidPath(
                 "Path does not start with the root"
@@ -57,10 +76,12 @@ class BaseModel(object):
         for group_name in groups:
             try:
                 cls.validate_group_name(group_name)
-            except errors.InvalidGroupName:
+            except errors.InvalidGroupName as ex:
                 raise errors.InvalidPath(
-                    "Path contains invalid group name {0}".format(
-                        group_name
+                    "Path ({0}) contains invalid group name {1} - {2}".format(
+                        path,
+                        group_name,
+                        ex
                     )
                 )
 

@@ -32,3 +32,11 @@ class InvalidGroupListing(InvalidGroupModel):
 
 class InvalidObjectListing(InvalidGroupModel):
     pass
+
+
+class InvalidObjectModel(DynamicNetworkConfigErrors):
+    pass
+
+
+class InvalidPropertyListing(InvalidObjectModel):
+    pass

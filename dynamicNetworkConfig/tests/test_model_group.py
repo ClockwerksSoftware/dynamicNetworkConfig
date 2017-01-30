@@ -18,7 +18,6 @@ class TestModelGroup(TestBase):
         self.empty_objects = [
         ]
 
-
     def tearDown(self):
         super(TestModelGroup, self).tearDown()
 
