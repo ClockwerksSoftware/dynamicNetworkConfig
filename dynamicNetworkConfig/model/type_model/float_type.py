@@ -1,3 +1,5 @@
+import six
+
 from dynamicNetworkConfig.model.type_model.base import BaseType
 
 try:
@@ -14,23 +16,39 @@ except ImportError:
 
 class FloatType(BaseType):
 
-    type_name = 'float'
+    type_name = six.text_type('float')
+    MIN_VALUE = float('-inf')
+    MAX_VALUE = float('inf')
 
-    def __init__(self, value, minimum, maximum, defaultValue):
+    @classmethod
+    def isInstance(cls, value):
+        return isinstance(value, float)
+
+    def __init__(self, value, minimum, maximum, defaultValue=None,
+                 readOnly=False):
         if defaultValue is None:
             defaultValue = 0.0
 
-        super(self, FloatType).__init__(
+        if minimum is None:
+            minimum = self.MIN_VALUE
+
+        if maximum is None:
+            if readOnly:
+                maximum = minimum
+            else:
+                maximum = self.MAX_VALUE
+
+        super(FloatType, self).__init__(
             self.type_name,
             value,
             minimum,
             maximum,
             defaultValue
         )
-        assert isinstance(self.value, float)
-        assert isinstance(self.minimum, float)
-        assert isinstance(self.maximum, float)
-        assert isinstance(self.default, float)
+        assert self.isInstance(self.value)
+        assert self.isInstance(self.minimum)
+        assert self.isInstance(self.maximum)
+        assert self.isInstance(self.default)
         assert (self.maximum >= self.minimum)
 
     def isMinimum(self, *args, **kwargs):

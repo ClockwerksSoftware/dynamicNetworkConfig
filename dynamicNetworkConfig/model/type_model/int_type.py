@@ -1,25 +1,45 @@
+import sys
+
+import six
+
 from dynamicNetworkConfig.model.type_model.base import BaseType
 
 
 class IntType(BaseType):
 
-    type_name = 'integer'
+    type_name = six.text_type('integer')
+    MIN_VALUE = ((sys.maxsize * -1) - 1)
+    MAX_VALUE = sys.maxsize
 
-    def __init__(self, value, minimum, maximum, defaultValue=None):
+    @classmethod
+    def isInstance(cls, value):
+        return isinstance(value, int)
+
+    def __init__(self, value, minimum, maximum, defaultValue=None,
+                 readOnly=False):
         if defaultValue is None:
             defaultValue = 0
 
-        super(self, IntType).__init__(
+        if minimum is None:
+            minimum = self.MIN_VALUE
+
+        if maximum is None:
+            if readOnly:
+                maximum = minimum
+            else:
+                maximum = self.MAX_VALUE
+
+        super(IntType, self).__init__(
             self.type_name,
             value,
             minimum,
             maximum,
             defaultValue
         )
-        assert isinstance(self.value, int)
-        assert isinstance(self.minimum, int)
-        assert isinstance(self.maximum, int)
-        assert isinstance(self.default, int)
+        assert self.isInstance(self.value)
+        assert self.isInstance(self.minimum)
+        assert self.isInstance(self.maximum)
+        assert self.isInstance(self.default)
         assert (self.maximum >= self.minimum)
 
     def isMinimum(self, *args, **kwargs):

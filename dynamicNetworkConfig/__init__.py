@@ -29,7 +29,7 @@ config_paths = [
 
 if 'HOME' in os.environ:
     config_paths.append(
-        os.path.join(environ['HOME'],
+        os.path.join(os.environ['HOME'],
                      '.dynamicNetworkConfig',
                      FILE_CONFIG_INI))
 

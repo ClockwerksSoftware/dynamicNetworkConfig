@@ -5,12 +5,25 @@ Base Type Model
 
 class BaseType(object):
 
+    @classmethod
+    def isInstance(cls, value):
+        raise NotImplementedError
+
     def __init__(self, name, value, minimumValue, maximumValue, defaultValue):
         self.__name = name
         self.__value = value
         self.__minimum = minimumValue
         self.__maximum = maximumValue
         self.__default = defaultValue
+        self.__is_string = False
+
+    @property
+    def is_string(self):
+        return self.__is_string
+
+    @is_string.setter
+    def is_string(self, value):
+        self.__is_string = value
 
     @property
     def name(self):

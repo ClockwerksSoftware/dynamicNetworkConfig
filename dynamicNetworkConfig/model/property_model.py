@@ -12,14 +12,14 @@ class PropertyModel(BaseModel):
     A model of a specific property
     """
 
-    FIELD_GROUP_NAME = "group"
-    FIELD_OBJECT_NAME = "object"
+    JSON_FIELD_GROUP_NAME = "group"
+    JSON_FIELD_OBJECT_NAME = "object"
 
-    FIELD_TYPE = "type"
-    FIELD_CURRENT_VALUE = "value"
-    FIELD_MAXIMUM_VALUE = "max"
-    FIELD_MINIMUM_VALUE = "min"
-    FIELD_READONLY = "readOnly"
+    JSON_FIELD_TYPE = "type"
+    JSON_FIELD_CURRENT_VALUE = "value"
+    JSON_FIELD_MAXIMUM_VALUE = "max"
+    JSON_FIELD_MINIMUM_VALUE = "min"
+    JSON_FIELD_READONLY = "readOnly"
 
     SUPPORTED_TYPES = tuple(TypeModel.type_list)
 
@@ -35,54 +35,64 @@ class PropertyModel(BaseModel):
         return cls(
             base.name,
             base.path,
-            data[cls.FIELD_GROUP_NAME],
-            data[cls.FIELD_OBJECT_NAME],
-            data[cls.FIELD_TYPE],
-            data[cls.FIELD_CURRENT_VALUE],
-            getValue(data, cls.FIELD_MAXIMUM_VALUE, None),
-            getValue(data, cls.FIELD_MINIMUM_VALUE, None),
-            getValue(data, cls.FIELD_READONLY, True)
+            data[cls.JSON_FIELD_GROUP_NAME],
+            data[cls.JSON_FIELD_OBJECT_NAME],
+            data[cls.JSON_FIELD_TYPE],
+            data[cls.JSON_FIELD_CURRENT_VALUE],
+            getValue(data, cls.JSON_FIELD_MAXIMUM_VALUE, None),
+            getValue(data, cls.JSON_FIELD_MINIMUM_VALUE, None),
+            getValue(data, cls.JSON_FIELD_READONLY, False)
         )
 
     def __init__(self, name, path, groupName, objectName, valueType,
                  currentValue, maxValue, minValue, readOnly):
+        super(PropertyModel, self).__init__(name, path)
+
         typeOfValue = TypeModel.getType(valueType)
 
-        super(self, PropertyModel).__init__(name, path)
         self.__group = groupName
         self.__object = objectName
-        self.__valueType = valueType,
+        self.__valueType = valueType
+
+        if readOnly is None:
+            readOnly = False
+
+        if minValue is None and readOnly:
+            minValue = maxValue
+
+        if maxValue is None and readOnly:
+            maxValue = minValue
 
         self.__valueObject = typeOfValue(
             currentValue,
             minValue,
-            maxValue
+            maxValue,
+            readOnly=readOnly
         )
+
+        assert isinstance(self.__valueObject, typeOfValue)
         self.__valueReadOnly = readOnly
 
-        assert isinstance(self.groupName, six.text_type)
-        assert isinstance(self.objectName, six.text_type)
-        assert isinstance(self.valueType, self.SUPPORTED_TYPES)
-        assert isinstance(self.value, six.text_type)
-        assert isinstance(self.maximum, type(self.valueType))
-        assert isinstance(self.minimum, type(self.valueType))
+        assert isinstance(self.groupName, six.string_types)
+        assert isinstance(self.objectName, six.string_types)
         assert self.readOnly in (True, False)
+        if self.readOnly:
+            assert self.maximum == self.minimum
 
     def serialize(self):
         def setValue(dataSet, fieldName, value):
-            if value is not None:
-                dataSet[fieldName] = value
+            dataSet[fieldName] = value
 
-        data = super(self, PropertyModel).serialize()
+        data = super(PropertyModel, self).serialize()
         propertyData = {
-            self.FIELD_GROUP_NAME: self.groupName,
-            self.FIELD_OBJECT_NAME: self.objectName,
-            self.FIELD_TYPE: self.valueType,
-            self.FIELD_CURRENT_VALUE: self.value,
+            self.JSON_FIELD_GROUP_NAME: self.groupName,
+            self.JSON_FIELD_OBJECT_NAME: self.objectName,
+            self.JSON_FIELD_TYPE: self.valueType,
+            self.JSON_FIELD_CURRENT_VALUE: self.value,
         }
-        setValue(propertyValue, self.FIELD_MAXIMUM_VALUE, self.maximum)
-        setValue(propertyValue, self.FIELD_MINIMUM_VALUE, self.minimum)
-        setValue(propertyValue, self.FIELD_READONLY, self.readOnly)
+        setValue(propertyData, self.JSON_FIELD_MAXIMUM_VALUE, self.maximum)
+        setValue(propertyData, self.JSON_FIELD_MINIMUM_VALUE, self.minimum)
+        setValue(propertyData, self.JSON_FIELD_READONLY, self.readOnly)
 
         data.update(propertyData)
         return data
@@ -114,3 +124,11 @@ class PropertyModel(BaseModel):
     @property
     def readOnly(self):
         return self.__valueReadOnly
+
+    @property
+    def MIN_VALUE(self):
+        return self.__valueObject.MIN_VALUE
+
+    @property
+    def MAX_VALUE(self):
+        return self.__valueObject.MAX_VALUE
