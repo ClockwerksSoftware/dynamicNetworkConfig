@@ -3,7 +3,9 @@ import ddt
 from dynamicNetworkConfig.tests import TestBase
 
 from dynamicNetworkConfig.common import errors
-from dynamicNetworkConfig.model.type_model.int_type import IntType
+from dynamicNetworkConfig.model.type_model.unsigned_int_type import (
+    UnsignedIntType
+)
 
 
 @ddt.ddt
@@ -22,7 +24,7 @@ class TestModelTypeModelInt(TestBase):
     def test_is_instance(self, value, matches):
         self.assertEqual(
             matches,
-            IntType.isInstance(value)
+            UnsignedIntType.isInstance(value)
         )
 
     @ddt.data(
@@ -39,7 +41,7 @@ class TestModelTypeModelInt(TestBase):
     )
     @ddt.unpack
     def test_instantiation(self, value, minimum, maximum, default, readOnly):
-        it = IntType(
+        it = UnsignedIntType(
             value, minimum, maximum,
             defaultValue=default,
             readOnly=readOnly
@@ -47,11 +49,11 @@ class TestModelTypeModelInt(TestBase):
 
         checkMinValue = (
             minimum if minimum is not None else (
-                maximum if readOnly else IntType.MIN_VALUE
+                maximum if readOnly else UnsignedIntType.MIN_VALUE
             )
         )
         checkMaxValue = (
-            maximum if maximum is not None else IntType.MAX_VALUE
+            maximum if maximum is not None else UnsignedIntType.MAX_VALUE
         )
         if maximum is None and readOnly:
             checkMaxValue = checkMinValue
@@ -65,54 +67,54 @@ class TestModelTypeModelInt(TestBase):
             self.assertEqual(it.default, it.DEFAULT_VALUE)
 
     @ddt.data(
-        (IntType.MIN_VALUE, None, True),
+        (UnsignedIntType.MIN_VALUE, None, True),
         (5, None, False),
         (5, 10, False),
         (5, 5, True)
     )
     @ddt.unpack
     def test_is_minimum(self, value, minimum, is_minimum):
-        it = IntType(
+        it = UnsignedIntType(
             value,
             minimum,
             None
         )
 
         checkMinValue = (
-            minimum if minimum is not None else  IntType.MIN_VALUE
+            minimum if minimum is not None else  UnsignedIntType.MIN_VALUE
         )
         self.assertEqual(it.minimum, checkMinValue)
         self.assertEqual(it.isMinimum(), is_minimum)
 
     @ddt.data(
-        (IntType.MAX_VALUE, None, True),
+        (UnsignedIntType.MAX_VALUE, None, True),
         (5, None, False),
         (5, 10, False),
         (5, 5, True)
     )
     @ddt.unpack
     def test_is_maximum(self, value, maximum, is_maximum):
-        it = IntType(
+        it = UnsignedIntType(
             value,
             None,
             maximum
         )
 
         checkMaxValue = (
-            maximum if maximum is not None else  IntType.MAX_VALUE
+            maximum if maximum is not None else  UnsignedIntType.MAX_VALUE
         )
         self.assertEqual(it.maximum, checkMaxValue)
         self.assertEqual(it.isMaximum(), is_maximum)
 
     @ddt.data(
-        (IntType.DEFAULT_VALUE, None, True),
+        (UnsignedIntType.DEFAULT_VALUE, None, True),
         (5, None, False),
         (5, 10, False),
         (5, 5, True)
     )
     @ddt.unpack
     def test_is_default(self, value, default, is_default):
-        it = IntType(
+        it = UnsignedIntType(
             value,
             None,
             None,
@@ -120,7 +122,7 @@ class TestModelTypeModelInt(TestBase):
         )
 
         checkValue = (
-            default if default is not None else IntType.DEFAULT_VALUE
+            default if default is not None else UnsignedIntType.DEFAULT_VALUE
         )
         self.assertEqual(it.default, checkValue)
         self.assertEqual(it.isDefault(), is_default)
@@ -132,8 +134,8 @@ class TestModelTypeModelInt(TestBase):
     )
     @ddt.unpack
     def test_comparison(self, value1, value2, lt, lte, eq, gte, gt):
-        it1 = IntType(value1, None, None)
-        it2 = IntType(value2, None, None)
+        it1 = UnsignedIntType(value1, None, None)
+        it2 = UnsignedIntType(value2, None, None)
 
         self.assertEqual(it1.isLessThan(it2), lt)
         self.assertEqual(it1.isLessThanOrEqual(it2), lte)
