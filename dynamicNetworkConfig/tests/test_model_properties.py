@@ -22,18 +22,19 @@ class TestModelProperties(TestBase):
         super(TestModelProperties, self).tearDown()
 
     @ddt.data(
-        (six.text_type('float'), 5.0, 10.0, -10.0, False),
-        (six.text_type('float'), 5.0, 5.0, 5.0, True),
-        (six.text_type('integer'), 5, 10, -10, False),
-        (six.text_type('integer'), 5, 5, 5, True),
-        (six.text_type('unsignedInteger'), 5, 10, 1, False),
-        (six.text_type('unsignedInteger'), 5, 5, 5, True),
-        (six.text_type('string'), six.text_type('hello'), 10, 4, False),
-        (six.text_type('string'), six.text_type('hello'), 5, 5, True)
+        (six.text_type('float'), 5.0, 10.0, -10.0, False, False),
+        (six.text_type('float'), 5.0, 5.0, 5.0, True, False),
+        (six.text_type('integer'), 5, 10, -10, False, False),
+        (six.text_type('integer'), 5, 5, 5, True, False),
+        (six.text_type('unsignedInteger'), 5, 10, 1, False, False),
+        (six.text_type('unsignedInteger'), 5, 5, 5, True, False),
+        (six.text_type('string'), six.text_type('hello'), 10, 4, False, True),
+        (six.text_type('string'), six.text_type('hello'), 5, 5, True, True)
     )
     @ddt.unpack
     def test_instantiation(self,
-            valueType, currentValue, maxValue, minValue, readOnly):
+            valueType, currentValue, maxValue, minValue, readOnly,
+            is_string):
         pm = PropertyModel(
             self.name, self.path, self.groupName, self.objectName,
             valueType, currentValue, maxValue, minValue, readOnly
@@ -47,6 +48,7 @@ class TestModelProperties(TestBase):
         self.assertEqual(pm.maximum, maxValue)
         self.assertEqual(pm.minimum, minValue)
         self.assertEqual(pm.readOnly, readOnly)
+        self.assertEqual(pm.is_string, is_string)
 
     @ddt.data(
         (six.text_type('float'), 5.0, 10.0, -10.0, False),

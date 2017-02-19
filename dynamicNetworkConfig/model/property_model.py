@@ -132,3 +132,7 @@ class PropertyModel(BaseModel):
     @property
     def MAX_VALUE(self):
         return self.__valueObject.MAX_VALUE
+
+    @property
+    def is_string(self):
+        return self.__valueObject.is_string
