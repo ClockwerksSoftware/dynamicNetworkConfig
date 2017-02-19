@@ -69,7 +69,7 @@ class TestModelBase(TestBase):
 
     @ddt.data(
         ('validName', True), ('1validName', True), ('validName2', True),
-        ('$invalidName', False)
+        ('$invalidName', False), ('', False)
     )
     @ddt.unpack
     def test_validate_object_name(self, object_name, is_valid):
