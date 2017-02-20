@@ -19,19 +19,41 @@ class TestModelTypeBase(TestBase):
     def tearDown(self):
         super(TestModelTypeBase, self).tearDown()
 
-    def test_instantiation(self):
+    @ddt.data(
+        (None, 4, None, False),
+        (4, None, None, False),
+        (4, 4, None, False),
+        (4, None, None, True),
+        (4, 20, "hello", False)
+    )
+    @ddt.unpack
+    def test_instantiation(self, min_value, max_value, default, readOnly):
         st = StringType(
             self.value,
-            self.min,
-            self.max
+            min_value,
+            max_value,
+            defaultValue=default,
+            readOnly=readOnly
+        )
+
+        minCheckValue = (
+            min_value if min_value is not None else StringType.MIN_VALUE
+        )
+        maxCheckValue = (
+            max_value if max_value is not None else (
+                minCheckValue if readOnly else StringType.MAX_VALUE
+            )
+        )
+        defaultCheckValue = (
+            default if default is not None else StringType.DEFAULT_VALUE
         )
 
         self.assertEqual(self.name, st.name)
         self.assertEqual(self.value, st.value)
-        self.assertEqual(self.min, st.minimum)
-        self.assertEqual(self.max, st.maximum)
+        self.assertEqual(minCheckValue, st.minimum)
+        self.assertEqual(maxCheckValue, st.maximum)
         self.assertTrue(st.isEqual(self.value))
-        self.assertEqual('', st.default)
+        self.assertEqual(defaultCheckValue, st.default)
         self.assertFalse(st.isDefault())
 
         with self.assertRaises(errors.InvalidTypeOperation):

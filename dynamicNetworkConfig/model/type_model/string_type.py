@@ -11,6 +11,7 @@ class StringType(BaseType):
     # for the purposes here, and especially since this can be overriden
     # the maximum of 32k should be sufficient
     MAX_VALUE = 32768
+    DEFAULT_VALUE = ''
 
     @classmethod
     def isInstance(cls, value):
@@ -20,7 +21,7 @@ class StringType(BaseType):
                  readOnly=False):
         customDefaultValue = True
         if defaultValue is None:
-            defaultValue = ''
+            defaultValue = self.DEFAULT_VALUE
             customDefaultValue = False
 
         if minimumLength is None:
