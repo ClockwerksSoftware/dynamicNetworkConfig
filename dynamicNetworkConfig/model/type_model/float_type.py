@@ -4,7 +4,8 @@ from dynamicNetworkConfig.model.type_model.base import BaseType
 
 try:
     from math import isclose
-except ImportError:
+
+except ImportError:  # noqa
     def isclose(a, b, rel_tol=1e-9, abs_tol=0.0):
         return (
             abs(a - b) <= max(
@@ -19,6 +20,9 @@ class FloatType(BaseType):
     type_name = six.text_type('float')
     MIN_VALUE = float('-inf')
     MAX_VALUE = float('inf')
+    DEFAULT_VALUE = 0.0
+    DEFAULT_RELATIVE_TOLERANCE = 0.0000001
+    DEFAULT_ABSOLUTE_TOLERANCE = 0.0000001
 
     @classmethod
     def isInstance(cls, value):
@@ -27,13 +31,16 @@ class FloatType(BaseType):
     def __init__(self, value, minimum, maximum, defaultValue=None,
                  readOnly=False):
         if defaultValue is None:
-            defaultValue = 0.0
+            defaultValue = self.DEFAULT_VALUE
 
         if minimum is None:
-            minimum = self.MIN_VALUE
+            if readOnly is True:
+                minimum = maximum if maximum is not None else minimum
+            else:
+                minimum = self.MIN_VALUE
 
         if maximum is None:
-            if readOnly:
+            if readOnly is True:
                 maximum = minimum
             else:
                 maximum = self.MAX_VALUE
@@ -52,10 +59,10 @@ class FloatType(BaseType):
         assert (self.maximum >= self.minimum)
 
     def isMinimum(self, *args, **kwargs):
-        return (len(self.value) == self.minimum)
+        return (self.value == self.minimum)
 
     def isMaximum(self, *args, **kwargs):
-        return (len(self.value) == self.maximum)
+        return (self.value == self.maximum)
 
     def isDefault(self, *args, **kwargs):
         return (self.value == self.default)
@@ -64,12 +71,22 @@ class FloatType(BaseType):
         assert isinstance(other, type(self))
         return (self.value > other.value)
 
-    def isGreaterThanOrEqual(self, *args, **kwargs):
+    def isGreaterThanOrEqual(self, other, *args, **kwargs):
         assert isinstance(other, type(self))
         return (self.value >= other.value)
 
-    def isEqual(self, other, *args, **kwargs):
+    def isEqual(self, other,
+                relative_tolerance=None,
+                absolute_tolerance=None,
+                *args, **kwargs):
         assert isinstance(other, type(self))
+
+        if relative_tolerance is None:
+            relative_tolerance = self.DEFAULT_RELATIVE_TOLERANCE
+
+        if absolute_tolerance is None:
+            absolute_tolerance = self.DEFAULT_ABSOLUTE_TOLERANCE
+
         return isclose(
             self.value,
             other.value,
@@ -77,10 +94,10 @@ class FloatType(BaseType):
             abs_tol=absolute_tolerance
         )
 
-    def isLessThanOrEqual(self, *args, **kwargs):
+    def isLessThanOrEqual(self, other, *args, **kwargs):
         assert isinstance(other, type(self))
         return (self.value <= other.value)
 
-    def isLessThan(self, *args, **kwargs):
+    def isLessThan(self, other, *args, **kwargs):
         assert isinstance(other, type(self))
         return (self.value < other.value)

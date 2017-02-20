@@ -3,43 +3,43 @@ import ddt
 from dynamicNetworkConfig.tests import TestBase
 
 from dynamicNetworkConfig.common import errors
-from dynamicNetworkConfig.model.type_model.int_type import IntType
+from dynamicNetworkConfig.model.type_model.float_type import FloatType
 
 
 @ddt.ddt
-class TestModelTypeModelInt(TestBase):
+class TestModelTypeModelFloat(TestBase):
 
     def setUp(self):
-        super(TestModelTypeModelInt, self).setUp()
+        super(TestModelTypeModelFloat, self).setUp()
 
     def tearDown(self):
-        super(TestModelTypeModelInt, self).tearDown()
+        super(TestModelTypeModelFloat, self).tearDown()
 
     @ddt.data(
-        (1, True), (1.0, False), ('hello', False)
+        (1, False), (1.0, True), ('hello', False)
     )
     @ddt.unpack
     def test_is_instance(self, value, matches):
         self.assertEqual(
             matches,
-            IntType.isInstance(value)
+            FloatType.isInstance(value)
         )
 
     @ddt.data(
-        (5, -10, 10, 0, False),
-        (5, 5, 5, 5, True),
-        (5, 5, 5, 5, False),
-        (5, None, 5, 5, False),
-        (5, None, 5, 5, True),
-        (5, 5, None, 5, False),
-        (5, 5, None, 5, True),
-        (5, None, None, 5, False),
-        (5, 5, 5, None, False),
-        (5, 5, 5, 5, None),
+        (5.0, -10.0, 10.0, 0.0, False),
+        (5.0, 5.0, 5.0, 5.0, True),
+        (5.0, 5.0, 5.0, 5.0, False),
+        (5.0, None, 5.0, 5.0, False),
+        (5.0, None, 5.0, 5.0, True),
+        (5.0, 5.0, None, 5.0, False),
+        (5.0, 5.0, None, 5.0, True),
+        (5.0, None, None, 5.0, False),
+        (5.0, 5.0, 5.0, None, False),
+        (5.0, 5.0, 5.0, 5.0, None),
     )
     @ddt.unpack
     def test_instantiation(self, value, minimum, maximum, default, readOnly):
-        it = IntType(
+        it = FloatType(
             value, minimum, maximum,
             defaultValue=default,
             readOnly=readOnly
@@ -47,11 +47,11 @@ class TestModelTypeModelInt(TestBase):
 
         checkMinValue = (
             minimum if minimum is not None else (
-                maximum if readOnly else IntType.MIN_VALUE
+                maximum if readOnly else FloatType.MIN_VALUE
             )
         )
         checkMaxValue = (
-            maximum if maximum is not None else IntType.MAX_VALUE
+            maximum if maximum is not None else FloatType.MAX_VALUE
         )
         if maximum is None and readOnly:
             checkMaxValue = checkMinValue
@@ -65,54 +65,54 @@ class TestModelTypeModelInt(TestBase):
             self.assertEqual(it.default, it.DEFAULT_VALUE)
 
     @ddt.data(
-        (IntType.MIN_VALUE, None, True),
-        (5, None, False),
-        (5, 10, False),
-        (5, 5, True)
+        (FloatType.MIN_VALUE, None, True),
+        (5.0, None, False),
+        (5.0, 10.0, False),
+        (5.0, 5.0, True)
     )
     @ddt.unpack
     def test_is_minimum(self, value, minimum, is_minimum):
-        it = IntType(
+        it = FloatType(
             value,
             minimum,
             None
         )
 
         checkMinValue = (
-            minimum if minimum is not None else IntType.MIN_VALUE
+            minimum if minimum is not None else FloatType.MIN_VALUE
         )
         self.assertEqual(it.minimum, checkMinValue)
         self.assertEqual(it.isMinimum(), is_minimum)
 
     @ddt.data(
-        (IntType.MAX_VALUE, None, True),
-        (5, None, False),
-        (5, 10, False),
-        (5, 5, True)
+        (FloatType.MAX_VALUE, None, True),
+        (5.0, None, False),
+        (5.0, 10.0, False),
+        (5.0, 5.0, True)
     )
     @ddt.unpack
     def test_is_maximum(self, value, maximum, is_maximum):
-        it = IntType(
+        it = FloatType(
             value,
             None,
             maximum
         )
 
         checkMaxValue = (
-            maximum if maximum is not None else IntType.MAX_VALUE
+            maximum if maximum is not None else FloatType.MAX_VALUE
         )
         self.assertEqual(it.maximum, checkMaxValue)
         self.assertEqual(it.isMaximum(), is_maximum)
 
     @ddt.data(
-        (IntType.DEFAULT_VALUE, None, True),
-        (5, None, False),
-        (5, 10, False),
-        (5, 5, True)
+        (FloatType.DEFAULT_VALUE, None, True),
+        (5.0, None, False),
+        (5.0, 10.0, False),
+        (5.0, 5.0, True)
     )
     @ddt.unpack
     def test_is_default(self, value, default, is_default):
-        it = IntType(
+        it = FloatType(
             value,
             None,
             None,
@@ -120,23 +120,43 @@ class TestModelTypeModelInt(TestBase):
         )
 
         checkValue = (
-            default if default is not None else IntType.DEFAULT_VALUE
+            default if default is not None else FloatType.DEFAULT_VALUE
         )
         self.assertEqual(it.default, checkValue)
         self.assertEqual(it.isDefault(), is_default)
 
     @ddt.data(
-        (5, 10, True, True, False, False, False),
-        (10, 10, False, True, True, True, False),
-        (10, 5, False, False, False, True, True)
+        (5.0, 10.0, True, True, False, False, False),
+        (10.0, 10.0, False, True, True, True, False),
+        (10.0, 5.0, False, False, False, True, True)
     )
     @ddt.unpack
     def test_comparison(self, value1, value2, lt, lte, eq, gte, gt):
-        it1 = IntType(value1, None, None)
-        it2 = IntType(value2, None, None)
+        it1 = FloatType(value1, None, None)
+        it2 = FloatType(value2, None, None)
 
         self.assertEqual(it1.isLessThan(it2), lt)
         self.assertEqual(it1.isLessThanOrEqual(it2), lte)
         self.assertEqual(it1.isEqual(it2), eq)
         self.assertEqual(it1.isGreaterThanOrEqual(it2), gte)
         self.assertEqual(it1.isGreaterThan(it2), gt)
+
+    @ddt.data(
+        (None, None, False),
+        (0.1, None, True),
+        (None, 0.1, True),
+        (0.1, 0.1, True)
+    )
+    @ddt.unpack
+    def test_is_equal(self, absolute_tolerance, relative_tolerance, is_equal):
+        it1 = FloatType(5.5, None, None)
+        it2 = FloatType(5.51, None, None)
+
+        self.assertEqual(
+            it1.isEqual(
+                it2,
+                absolute_tolerance=absolute_tolerance,
+                relative_tolerance=relative_tolerance
+            ),
+            is_equal
+        )

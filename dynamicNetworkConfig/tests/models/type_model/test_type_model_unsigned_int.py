@@ -9,13 +9,13 @@ from dynamicNetworkConfig.model.type_model.unsigned_int_type import (
 
 
 @ddt.ddt
-class TestModelTypeModelInt(TestBase):
+class TestModelTypeModelUnsignedInt(TestBase):
 
     def setUp(self):
-        super(TestModelTypeModelInt, self).setUp()
+        super(TestModelTypeModelUnsignedInt, self).setUp()
 
     def tearDown(self):
-        super(TestModelTypeModelInt, self).tearDown()
+        super(TestModelTypeModelUnsignedInt, self).tearDown()
 
     @ddt.data(
         (1, True), (1.0, False), ('hello', False)
@@ -28,7 +28,7 @@ class TestModelTypeModelInt(TestBase):
         )
 
     @ddt.data(
-        (5, -10, 10, 0, False),
+        (5, 0, 10, 0, False),
         (5, 5, 5, 5, True),
         (5, 5, 5, 5, False),
         (5, None, 5, 5, False),
@@ -57,7 +57,39 @@ class TestModelTypeModelInt(TestBase):
         )
         if maximum is None and readOnly:
             checkMaxValue = checkMinValue
-        
+
+        self.assertEqual(it.value, value)
+        self.assertEqual(it.minimum, checkMinValue)
+        self.assertEqual(it.maximum, checkMaxValue)
+        if default is not None:
+            self.assertEqual(it.default, default)
+        else:
+            self.assertEqual(it.default, it.DEFAULT_VALUE)
+
+    @ddt.data(
+        (5, -10, 10, 0, False),
+    )
+    @ddt.unpack
+    def test_instantiation_no_negatives(self, value, minimum, maximum,
+                                        default, readOnly):
+        it = UnsignedIntType(
+            value, minimum, maximum,
+            defaultValue=default,
+            readOnly=readOnly
+        )
+        checkMinValue = (
+            minimum if (
+                minimum is not None and minimum >= UnsignedIntType.MIN_VALUE
+            ) else (
+                maximum if readOnly else UnsignedIntType.MIN_VALUE
+            )
+        )
+        checkMaxValue = (
+            maximum if maximum is not None else UnsignedIntType.MAX_VALUE
+        )
+        if maximum is None and readOnly:
+            checkMaxValue = checkMinValue
+
         self.assertEqual(it.value, value)
         self.assertEqual(it.minimum, checkMinValue)
         self.assertEqual(it.maximum, checkMaxValue)
@@ -81,7 +113,7 @@ class TestModelTypeModelInt(TestBase):
         )
 
         checkMinValue = (
-            minimum if minimum is not None else  UnsignedIntType.MIN_VALUE
+            minimum if minimum is not None else UnsignedIntType.MIN_VALUE
         )
         self.assertEqual(it.minimum, checkMinValue)
         self.assertEqual(it.isMinimum(), is_minimum)
@@ -101,7 +133,7 @@ class TestModelTypeModelInt(TestBase):
         )
 
         checkMaxValue = (
-            maximum if maximum is not None else  UnsignedIntType.MAX_VALUE
+            maximum if maximum is not None else UnsignedIntType.MAX_VALUE
         )
         self.assertEqual(it.maximum, checkMaxValue)
         self.assertEqual(it.isMaximum(), is_maximum)
